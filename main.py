@@ -1,9 +1,6 @@
-from dis import disco
-from turtle import title
-from webbrowser import get
-from requests_html import HTMLSession
+from requests_html import AsyncHTMLSession
+import asyncio
 import json
-import re
 from gmail import createMessage
 
 def getData():
@@ -15,29 +12,32 @@ def saveData(data):
     with open('data.json', 'w') as file:
         json.dump(data, file, indent=4)
 
-def scrape(asin):
-    session = HTMLSession()
-    page = session.get(f'https://www.amazon.ca/gp/product/{asin}')
-    page.html.render(timeout=20)  
-    title = page.html.find('#productTitle')[0].text    
+from requests_html import AsyncHTMLSession
+import asyncio
+
+async def scrape(asin):
+    asession = AsyncHTMLSession() 
+    page = await asession.get(f'https://www.amazon.ca/gp/product/{asin}')
+    await page.html.arender(timeout = 10) # sleeping is optional but do it just in case 
     try:
+        title = page.html.find('#productTitle')[0].text 
         price = page.html.find('.a-offscreen')[0].text.replace('$','').strip()
     except:
         whole = page.html.find('.a-price-whole')[0].text
         fraction = page.html.find('.a-price-fraction')[0].text
         price = whole+fraction
+    await asession.close() # this part is important otherwise the Unwanted Kill.Chrome Error can Occur 
     print(title, price)
     return price, title
 
-def track(link, email, username):
-    newAsin = re.search(r'/[dg]p/([^/]+)', link, flags=re.IGNORECASE).group(1)
+async def track(asin, email, username):
     data = getData()
-    if newAsin in data["ASIN"] and username not in data["ASIN"][newAsin][0]["usernames"]:
-        data["ASIN"][newAsin][0]["emails"].append(email)
-        data["ASIN"][newAsin][0]["usernames"].append(username)
-    elif newAsin not in data["ASIN"]:
-        price = scrape(newAsin)
-        info = {f"{newAsin}": [
+    if asin in data["ASIN"] and username not in data["ASIN"][asin][0]["usernames"]:
+        data["ASIN"][asin][0]["emails"].append(email)
+        data["ASIN"][asin][0]["usernames"].append(username)
+    elif asin not in data["ASIN"]:
+        price = (await scrape(asin))[0]
+        info = {f"{asin}": [
             {
                 "price": float(price),
                 "emails": [
@@ -77,7 +77,8 @@ def comparePrice(price_title, asin):
 def main():
     data = getData()
     for asin in data["ASIN"]:
-        price_title = scrape(asin)
+        price_title = asyncio.run(scrape(asin))
         comparePrice(price_title, asin)
 
-main()
+if __name__ == "__main__":
+    main()

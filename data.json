@@ -1,13 +1,57 @@
 {
     "ASIN": {
-        "B075VGN4M1": [
+        "B09C5VRSRG": [
             {
-                "price": 129.98,
+                "price": 164.99,
                 "emails": [
-                    "razeen1029@gmail.com"
+                    "razeendrake@gmail.com"
                 ],
                 "usernames": [
-                    "zens"
+                    "zens#2250"
+                ]
+            }
+        ],
+        "B08BFF4C7J": [
+            {
+                "price": 99.98,
+                "emails": [
+                    "razeendrake@gmail.com"
+                ],
+                "usernames": [
+                    "zens#2250"
+                ]
+            }
+        ],
+        "B08S999YC8": [
+            {
+                "price": 389.99,
+                "emails": [
+                    "razeendrake@gmail.com"
+                ],
+                "usernames": [
+                    "zens#2250"
+                ]
+            }
+        ],
+        "B082DYSQVF": [
+            {
+                "price": 270.0,
+                "emails": [
+                    "razeendrake@gmail.com"
+                ],
+                "usernames": [
+                    "zens#2250"
+                ]
+            }
+        ],
+        "B086KXKTR2": [
+            {
+                "price": 58.98,
+                "emails": [
+                    "razeendrake@gmail.com"
+                ],
+                "usernames": [
+                    "zens#2250"
                 ]
             }
         ]

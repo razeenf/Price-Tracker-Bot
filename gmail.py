@@ -10,7 +10,7 @@ from apiclient import errors, discovery
 SCOPES = 'https://www.googleapis.com/auth/gmail.send'
 CLIENT_SECRET_FILE = 'client_secret.json'
 
-def get_credentials():
+def getCredentials():
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
@@ -37,7 +37,7 @@ def createMessage(recipient, username, title, price, listedPrice, discount, asin
 
 def sendMessage(email):
     # creates gmail api instance 
-    http = get_credentials().authorize(httplib2.Http())
+    http = getCredentials().authorize(httplib2.Http())
     service = discovery.build('gmail', 'v1', http)
     try:
         message = (service.users().messages().send(userId="me", body=email).execute())
