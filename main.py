@@ -1,24 +1,21 @@
 from requests_html import AsyncHTMLSession
 import asyncio
-import json
 from gmail import createMessage
+import pymongo
+import certifi
+from pymongo import MongoClient
+from dotenv import load_dotenv
+from os import getenv
 
-def getData():
-    with open('data.json') as file:
-        data = json.load(file)
-    return data
-
-def saveData(data):
-    with open('data.json', 'w') as file:
-        json.dump(data, file, indent=4)
-
-from requests_html import AsyncHTMLSession
-import asyncio
+load_dotenv('.env')
+cluster = pymongo.MongoClient(getenv('LOGIN'), tlsCAFile=certifi.where())
+db = cluster["Amazon-Price-Tracker"]
+collection = db["Entries"]
 
 async def scrape(asin):
     asession = AsyncHTMLSession() 
     page = await asession.get(f'https://www.amazon.ca/gp/product/{asin}')
-    await page.html.arender(timeout = 10) # sleeping is optional but do it just in case 
+    await page.html.arender(timeout = 20) 
     try:
         title = page.html.find('#productTitle')[0].text 
         price = page.html.find('.a-offscreen')[0].text.replace('$','').strip()
@@ -26,59 +23,56 @@ async def scrape(asin):
         whole = page.html.find('.a-price-whole')[0].text
         fraction = page.html.find('.a-price-fraction')[0].text
         price = whole+fraction
-    await asession.close() # this part is important otherwise the Unwanted Kill.Chrome Error can Occur 
+    await asession.close() 
     print(title, price)
     return price, title
 
 async def track(asin, email, username):
-    data = getData()
-    if asin in data["ASIN"] and username not in data["ASIN"][asin][0]["usernames"]:
-        data["ASIN"][asin][0]["emails"].append(email)
-        data["ASIN"][asin][0]["usernames"].append(username)
-    elif asin not in data["ASIN"]:
-        price = (await scrape(asin))[0]
-        info = {f"{asin}": [
-            {
-                "price": float(price),
-                "emails": [
-                    f"{email}"
-                ],
-                "usernames": [
-                    f"{username}"
-                ]
+    asinList = collection.distinct("entry.ASIN")
+    usernameList = collection.distinct("entry.user-info.username")
+    if asin in asinList and username not in usernameList:
+        collection.update_one(
+            {"entry.ASIN" : asin},
+            {"$push": {
+                    "entry.user-info": {
+                        "username": f"{username}",
+                        "email": f"{email}"
+                    }
+                }
             }
-        ]}
-        data["ASIN"].update(info)
-    saveData(data)
+        )
+    elif asin not in asinList:
+        price = (await scrape(asin))[0]
+        entry = {"entry": 
+            {
+                "ASIN": f"{asin}",
+                "price": float(price),
+                "user-info": [
+                {
+                    "username":f"{username}",
+                    "email":f"{email}"
+                }]
+            }
+        }
+        collection.insert_one(entry)
 
-def notify(asin, title, price, listedPrice, discount):
-    data = getData()
-    emailList = data["ASIN"][asin][0]["emails"]
-    index = 0
-    for email in emailList:
-        username = data["ASIN"][asin][0]["usernames"][index]
-        createMessage(email, username, title, price, listedPrice, discount, asin) 
-        index+=1
-    del data["ASIN"][asin]
-    saveData(data)
+def notify(document, title, price, listedPrice, discount):
+    for userInfo in document["user-info"]:
+        createMessage(userInfo["email"], userInfo["username"], title, price, listedPrice, discount, document["ASIN"]) 
+    collection.delete_one({"entry.ASIN":document["ASIN"]}) #delete the doc where the entry.ASIN matches the ASIN of current open doc
 
-def comparePrice(price_title, asin):
+def comparePrice(price_title, document):
     price = price_title[0]
     title = price_title[1]
-    data = getData()
-    listedPrice = data["ASIN"][asin][0]["price"]
+    listedPrice = document["price"]
     if float(price) < listedPrice:
         discount = int(((listedPrice-float(price))/listedPrice)*100)
         print("On sale. Sending out emails...")
-        notify(asin, title, price, listedPrice, discount)
+        notify(document, title, price, listedPrice, discount)
     else:
         print("No sale.")
 
-def main():
-    data = getData()
-    for asin in data["ASIN"]:
-        price_title = asyncio.run(scrape(asin))
-        comparePrice(price_title, asin)
-
-if __name__ == "__main__":
-    main()
+async def main():
+    for document in collection.distinct("entry"):
+        price_title = await scrape(document["ASIN"])
+        comparePrice(price_title, document)
