@@ -11,14 +11,14 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 async def verifyLink(message, link, email, username):
-    if 'B0' in link:
+    if link.startswith("https://www.amazon.ca/") and 'B0' in link:
         asin = re.search(r'/[dg]p/([^/]+)', link, flags=re.IGNORECASE).group(1)
         if asin[:2] != 'B0':
             asin = re.search(r'/product/([^/]+)', link, flags=re.IGNORECASE).group(1)
-        await track(asin, email, username)
         response = "Your item is being tracked, you'll be notified via email when the price drops!"
+        await track(asin, email, username)
     else:
-        response = "Invalid link, type '!help' for list of commands."
+        response = "Invalid link, make sure it's an Amazon.ca product page link."
     await message.channel.send(response)
 
 @tasks.loop(minutes=5)
@@ -42,10 +42,7 @@ async def on_message(message):
             username = str(message.author)
             await verifyLink(message, link, email, username)
         except: 
-            await message.channel.send("Invalid command, type '!help' for list of commands.")
-    elif message.content == '!help':
-        await message.channel.send("Try: !track (email) (amazon link)")
+            await message.channel.send("Invalid command, please follow this format: ```!track <email address> <amazon link>```")
     else: 
         return 
 client.run(getenv('TOKEN'))
-
