@@ -36,7 +36,6 @@ def createMessage(recipient, username, title, price, listedPrice, discount, asin
     sendMessage(email)
 
 def sendMessage(email):
-    # creates gmail api instance 
     http = getCredentials().authorize(httplib2.Http())
     service = discovery.build('gmail', 'v1', http)
     try:
