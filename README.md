@@ -1,6 +1,12 @@
 # Amazon Price Tracker Discord Bot 
 
-A simple to use bot that allows for users to feed it an Amazon.ca link of a product they wish to track for a price drop. If the price of the item drops the user will be sent an email to notify them. Try it out yourself! 
+A simple to use Discord bot that helps you track Amazon.ca products for price drops. Simply give the bot a link of the product you wish to track along with your email and It'll notify you through email when the product goes on sale. 
+
+### List of Commands:
+
+* !commands
+* !track <<e>email address> <<e>amazon link>
+* !stop <<e>amazon link>
 
 ## How it Works
 
@@ -12,16 +18,7 @@ Every few minutes the program loops through the documents, obtains the ASIN valu
 
 This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord API. 
 
-## List of Commands
-<pre><code>!commands 
-!track <<e>email address> <<e>amazon link>
-!stop <<e>amazon link>
-</code></pre>
-
 ## Preview
 <p align="center">
   <img src="demo.png" />
 </p>
-
-
-
