@@ -15,9 +15,10 @@ The **!stop** command allows users to stop tracking a product, it requires the a
 
 Every few minutes the program loops through the documents, obtains the ASIN values, scrapes the current prices on the Amazon site and compares it to the price written on file. If there is price drop all users tracking the product will be notified through a ping on discord and an email is created using an HTML template and is then sent out using the Gmail API to all users. The associated document is then deleted from the database.
 
-This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord API. 
+This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord API. It's containerized with Docker and hosted on AWS EC2.
 
 ## Preview
 <p align="center">
-  <img src="demo.png" />
+  <img src="demo/discord.png"><br>
+  <img src="demo/email.png">
 </p>

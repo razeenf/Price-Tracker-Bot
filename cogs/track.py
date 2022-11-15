@@ -1,3 +1,4 @@
+import discord 
 from discord.ext import commands
 from discord.ext import tasks
 from data import fetch_data
@@ -10,15 +11,21 @@ class track(commands.Cog):
         self.run.start()
     
     @commands.command()
-    async def mention(self, userID, channelID, discount, asin):
+    async def mention(self, userID, channelID, sale_price, original_price, discount, asin, title, img):
         channel = self.bot.get_channel(channelID)
-        await channel.send(f"Hey <@{userID}>, A product your tracking is on sale for **{discount}%** off! Buy it here: https://www.amazon.ca/dp/{asin}")
+        embed = discord.Embed(title=f"{title}", url=f'https://www.amazon.ca/gp/product/{asin}', color=discord.Color.orange())
+        embed.set_thumbnail(url=img)
+        embed.add_field(name="Discount Amount:", value=f'{discount}%')
+        embed.add_field(name="Original Price:", value=original_price)
+        embed.add_field(name="Sale Price:", value=sale_price)
+        embed.set_footer(text='This item is no longer being tracked.')
+        await channel.send(f"Hey <@{userID}>, a product you're tracking is on sale!", embed=embed)
 
     async def notify(self, document, current_price, discount):
-        title = await scrape('title', document["ASIN"])     
+        details = await scrape('details', document["ASIN"])     
         for userInfo in document["user-info"]:
-            await self.mention(userInfo["userID"], userInfo["channelID"], discount, document["ASIN"])
-            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), title, current_price, document["price"], discount, document["ASIN"]) 
+            await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], details[0], details[1])
+            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), details[0], current_price, document["price"], discount, document["ASIN"]) 
         fetch_data().delete_one({"entry.ASIN":document["ASIN"]}) 
 
     def compare_price(self, current_price, listed_price):

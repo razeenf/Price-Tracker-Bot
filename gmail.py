@@ -24,7 +24,7 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def create_message(recipient, username, title, price, listedPrice, discount, asin):
+def create_message(recipient, username, title, sale_price, original_price, discount, asin):
     msg = MIMEMultipart()
     msg['Subject']  = "An item you're tracking is on sale!"
     msg['To'] = recipient
