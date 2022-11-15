@@ -19,6 +19,6 @@ This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord 
 
 ## Preview
 <p align="center">
-  <img src="demo/discord.png"><br>
-  <img src="demo/email.png">
+  <img src="images/discord.png"><br>
+  <img src="images/email.png">
 </p>
