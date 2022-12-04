@@ -1,11 +1,19 @@
 # Amazon Price Tracker Discord Bot 
 
-A simple to use Discord bot that helps you track Amazon.ca products for price drops. Simply give the bot a link of the product you wish to track along with your email and It'll notify you through a discord ping and email when the product goes on sale. 
+A simple to use Discord bot that helps you track Amazon.ca products for price drops. Simply give the bot a link of the product you wish to track along with your email and It'll notify you through a discord ping and email when the product goes on sale. You can try out the bot [here](https://bit.ly/Price-Tracker-Bot), or view the commands and more [here](#list-of-commands).
+
+## Preview
+<p align="center">
+  <img src="images/discord.png"><br>
+  <img src="images/email.png">
+</p>
 
 ### List of Commands:
-* !help
-* !track <<e>email address> <<e>amazon link>
-* !stop <<e>amazon link>
+
+- !help
+- !track `<email address>` `<amazon link>`
+- !stop `<amazon link>`
+
 
 ## How it Works
 
@@ -15,10 +23,5 @@ The **!stop** command allows users to stop tracking a product, it requires the a
 
 Every few minutes the program loops through the documents, obtains the ASIN values, scrapes the current prices on the Amazon site and compares it to the price written on file. If there is price drop all users tracking the product will be notified through a ping on discord and an email is created using an HTML template and is then sent out using the Gmail API to all users. The associated document is then deleted from the database.
 
-This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord API. It's containerized with Docker and hosted on AWS EC2.
+This project utilizes Asynchronous Web Scraping, MonogDB, Gmail API and Discord API. It's containerized with Docker and hosted on AWS.
 
-## Preview
-<p align="center">
-  <img src="images/discord.png"><br>
-  <img src="images/email.png">
-</p>

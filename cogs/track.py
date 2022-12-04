@@ -12,13 +12,20 @@ class track(commands.Cog):
     
     @commands.command()
     async def mention(self, userID, channelID, sale_price, original_price, discount, asin, title, img):
-        channel = self.bot.get_channel(channelID)
         embed = discord.Embed(title=f"{title}", url=f'https://www.amazon.ca/gp/product/{asin}', color=discord.Color.orange())
         embed.set_thumbnail(url=img)
         embed.add_field(name="Discount Amount:", value=f'{discount}%')
         embed.add_field(name="Original Price:", value=original_price)
         embed.add_field(name="Sale Price:", value=sale_price)
         embed.set_footer(text='This item is no longer being tracked.')
+        
+        if self.bot.get_channel(channelID) is not None:
+            channel = self.bot.get_channel(channelID)
+        elif self.bot.get_user(userID) is not None:
+            print("Channel not found.")
+            channel = await self.bot.fetch_user(userID)
+        else: return
+
         await channel.send(f"Hey <@{userID}>, a product you're tracking is on sale!", embed=embed)
 
     async def notify(self, document, current_price, discount):
