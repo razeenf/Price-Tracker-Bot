@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from os import getenv
 from scraper import scrape
 
-load_dotenv('.env')
-cluster = MongoClient(getenv('LOGIN'), tlsCAFile=certifi.where())
+load_dotenv('credentials/.env')
+cluster = MongoClient(getenv('MONGO_URI'), tlsCAFile=certifi.where())
 db = cluster["Amazon-Price-Tracker"]
 collection = db["Entries"]
 

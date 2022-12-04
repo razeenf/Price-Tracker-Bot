@@ -8,14 +8,13 @@ from email.mime.text import MIMEText
 from apiclient import errors, discovery
 
 SCOPES = 'https://www.googleapis.com/auth/gmail.send'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = 'credentials/client_secret.json'
 
 def get_credentials():
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir, 'gmail-python-email-send.json')
+    path = os.path.expanduser('credentials')
+    if not os.path.exists(path):
+        os.makedirs(path)
+    credential_path = os.path.join(path, 'authentication.json')     #Only works in Windows
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:

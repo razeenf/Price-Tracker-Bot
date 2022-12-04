@@ -5,7 +5,7 @@ import asyncio
 from dotenv import load_dotenv
 from os import getenv
 
-load_dotenv('.env')
+load_dotenv('credentials/.env')
 intents = discord.Intents.all()
 intents.members = True
 activity = discord.Activity(type=discord.ActivityType.watching, name="Amazon Prices")
