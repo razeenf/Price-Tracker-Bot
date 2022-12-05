@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext import tasks
 from data import fetch_data
-from scraper import scrape
+from scraper import Scraper
 from gmail import create_message
 
 class track(commands.Cog):
@@ -29,7 +29,7 @@ class track(commands.Cog):
         await channel.send(f"Hey <@{userID}>, a product you're tracking is on sale!", embed=embed)
 
     async def notify(self, document, current_price, discount):
-        details = await scrape('details', document["ASIN"])     
+        details = await Scraper().get_details(document["ASIN"])     
         for userInfo in document["user-info"]:
             await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], details[0], details[1])
             create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), details[0], current_price, document["price"], discount, document["ASIN"]) 
@@ -47,11 +47,13 @@ class track(commands.Cog):
     @tasks.loop(minutes=30)
     async def run(self):
         for document in fetch_data().distinct("entry"):
-            current_price = await scrape('price', document["ASIN"])
-            discount = self.compare_price(current_price, document["price"])
-            if discount: 
-                print("Sending out emails")          
-                await self.notify(document, current_price, discount)  
+            print("\nScraping", document["ASIN"])
+            current_price = await Scraper().get_price(document["ASIN"])
+            if current_price is not None:
+                discount = self.compare_price(current_price, document["price"])
+                if discount: 
+                    print("Sending out emails...")          
+                    await self.notify(document, current_price, discount)  
         
 async def setup(bot):
     await bot.add_cog(track(bot))

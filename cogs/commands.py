@@ -16,8 +16,10 @@ class commands(commands.Cog):
         elif '@' not in email or '.com' not in email:
             response = "Invalid email."
         else:
-            await add(asin, email, userID, channelID)
-            response = "Your item is being tracked, you'll be notified via discord & email when the price drops!"
+            output = await add(asin, email, userID, channelID)
+            if output is False:
+                response = "That product is not in stock so I cannot track it for price drops."
+            else: response = "Your item is being tracked, you'll be notified via discord & email when the price drops!"
         await ctx.send(response)
 
     @commands.command()

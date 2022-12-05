@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import certifi
 from dotenv import load_dotenv
 from os import getenv
-from scraper import scrape
+from scraper import Scraper
 
 load_dotenv('credentials/.env')
 cluster = MongoClient(getenv('MONGO_URI'), tlsCAFile=certifi.where())
@@ -24,7 +24,9 @@ async def add(asin, email, userID, channelID):
             }
         )
     elif asin not in asinList:
-        price = await scrape('price', asin)
+        price = await Scraper().get_price(asin)
+        if price is None:
+            return False
         entry = {"entry": 
             {
                 "ASIN": f"{asin}",
