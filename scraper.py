@@ -1,6 +1,6 @@
 from requests_html import AsyncHTMLSession
 
-class Scraper():
+class Scraper:
 
     async def req(self, asin):
         session = await AsyncHTMLSession().get(f'https://www.amazon.ca/gp/product/{asin}')
