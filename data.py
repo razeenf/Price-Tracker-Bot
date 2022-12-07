@@ -9,9 +9,13 @@ cluster = MongoClient(getenv('MONGO_URI'), tlsCAFile=certifi.where())
 db = cluster["Amazon-Price-Tracker"]
 collection = db["Entries"]
 
+def view(userID):    
+    for doc in collection.find({"entry.user-info.userID": userID}):
+        yield doc.get("entry").get("ASIN"), doc.get("entry").get("price")
+    
 async def add(asin, email, userID, channelID):
-    asinList = collection.distinct("entry.ASIN")
-    if asin in asinList: 
+    asin_list = collection.distinct("entry.ASIN")
+    if asin in asin_list: 
         collection.update_one( 
             {"entry.ASIN" : asin},
             {"$addToSet": {
@@ -23,7 +27,7 @@ async def add(asin, email, userID, channelID):
                 }
             }
         )
-    elif asin not in asinList:
+    elif asin not in asin_list:
         price = await Scraper().get_price(asin)
         if price is None:
             return False
@@ -42,8 +46,8 @@ async def add(asin, email, userID, channelID):
         collection.insert_one(entry)
 
 def remove(userID, asin):
-    asinList = collection.distinct("entry.ASIN")
-    if asin in asinList: 
+    asin_list = collection.distinct("entry.ASIN")
+    if asin in asin_list: 
         collection.update_one(
             {"entry.ASIN" : asin},
             {"$pull": {

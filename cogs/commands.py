@@ -1,5 +1,6 @@
+import discord
 from discord.ext import commands
-from data import add, remove
+from data import add, remove, view
 import re
 
 class commands(commands.Cog):
@@ -7,10 +8,21 @@ class commands(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def view(self, ctx):
+        products = view(ctx.author.id)
+        embed = discord.Embed(title="Products You're Currently Tracking:", color=discord.Color.orange())
+        for doc in products:
+            print(doc)
+            embed.add_field(name=f"https://www.amazon.ca/dp/{doc[0]}", value=f"Price: ${doc[1]}", inline=False)
+            embed.set_footer(text='You can view up to 25 products.')
+        await ctx.send(embed=embed)
+        
+    @commands.command()
     async def track(self, ctx, email, *, link):
         userID = ctx.author.id
         channelID = ctx.channel.id
         asin = await verify(link)   
+
         if asin is False:
             response = "Invalid link, make sure it's an Amazon.ca product page link."  
         elif '@' not in email or '.com' not in email:
