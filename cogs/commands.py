@@ -12,7 +12,6 @@ class commands(commands.Cog):
         products = view(ctx.author.id)
         embed = discord.Embed(title="Products You're Currently Tracking:", color=discord.Color.orange())
         for doc in products:
-            print(doc)
             embed.add_field(name=f"https://www.amazon.ca/dp/{doc[0]}", value=f"Price: ${doc[1]}", inline=False)
             embed.set_footer(text='You can view up to 25 products.')
         await ctx.send(embed=embed)
@@ -46,7 +45,9 @@ class commands(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
-        await ctx.send("List of commands:```!track <email address> <amazon link>```"+"```!stop <amazon link>```")
+        await ctx.send("List of commands:```!track <email address> <amazon link>```"+
+        "```!stop <amazon link>```"+
+        "```!view```")
 
 async def verify(link):
     if link.startswith("https://www.amazon.ca/") and 'B0' in link:
