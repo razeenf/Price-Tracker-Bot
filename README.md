@@ -1,6 +1,6 @@
 # Amazon Price Tracker Discord Bot 
 
-A simple to use Discord bot that helps you track Amazon.ca products for price drops. Simply give the bot a link of the product you wish to track along with your email and It'll notify you through a discord ping and email when the product goes on sale. You can try out the bot [here](https://bit.ly/Price-Tracker-Bot), or view the commands and more [here](#list-of-commands).
+A simple to use Discord bot that helps you track Amazon.ca products for price drops. Simply give the bot a link of the product you wish to track along with your email and It'll notify you through a discord ping and email when the product goes on sale. You can try out the bot [here](https://bit.ly/Price-Tracker-Bot), or view the commands and how it works [here](#list-of-commands).
 
 ## Preview
 <p align="center">
