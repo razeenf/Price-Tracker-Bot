@@ -4,8 +4,10 @@ A simple to use Discord bot that helps you track Amazon.ca products for price dr
 
 ## Preview
 <p align="center">
-  <img src="images/discord.png"><br>
-  <img src="images/email.png">
+  <img src="assets/track.png"><br>
+  <img src="assets/view.png"><br>
+  <img src="assets/ping.png"><br>
+  <img src="assets/email.png">
 </p>
 
 ### List of Commands:
