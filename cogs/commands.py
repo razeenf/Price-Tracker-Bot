@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from data import add, remove, view
+from scraper import Scraper
 import re
 
 class commands(commands.Cog):
@@ -11,8 +12,10 @@ class commands(commands.Cog):
     async def view(self, ctx):
         products = view(ctx.author.id)
         embed = discord.Embed(title="Products You're Currently Tracking:", color=discord.Color.orange())
+        await ctx.send("Fetching your products...")
         for doc in products:
-            embed.add_field(name=f"https://www.amazon.ca/dp/{doc[0]}", value=f"Price: ${doc[1]}", inline=False)
+            name = await Scraper().scrape('title', doc[0])    
+            embed.add_field(name=f"{name}", value=f"Price: ${doc[1]} | [Product Page](https://www.amazon.ca/dp/{doc[0]})", inline=False)
             embed.set_footer(text='You can view up to 25 products.')
         await ctx.send(embed=embed)
         

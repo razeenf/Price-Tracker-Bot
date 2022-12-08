@@ -1,22 +1,30 @@
 from requests_html import AsyncHTMLSession
 
 class Scraper:
-
-    async def req(self, asin):
-        session = await AsyncHTMLSession().get(f'https://www.amazon.ca/gp/product/{asin}')
-        print("Status:", session.status_code)
-        await session.html.arender(timeout = 20) 
-        return session
+    async def scrape(self, key, asin): # BIG MEMORY LEAK FIX ASAP TOO MANY CHROMIUM INSTANCES
+        asession = AsyncHTMLSession()
+        page = await asession.get(f'https://www.amazon.ca/dp/{asin}')
+        print("Status:", page.status_code)
+        await page.html.arender(timeout = 20) 
+        match key:
+            case 'price':
+                data = self.get_price(page)
+            case 'title':
+                data = self.get_title(page)
+            case 'img':
+                data = self.get_img(page)
+            case _:
+                return 'Error'
+        await asession.close()
+        return data
         
-    async def get_price(self, asin):
-        session = await self.req(asin) 
+    def get_price(self, page):
         try:
-            price = session.html.find('.a-offscreen')[0].text.replace('$','').strip()
+            price = page.html.find('.a-offscreen')[0].text.replace('$','').strip()
         except IndexError:
-            whole = session.html.find('.a-price-whole')[0].text
-            fraction = session.html.find('.a-price-fraction')[0].text
+            whole = page.html.find('.a-price-whole')[0].text
+            fraction = page.html.find('.a-price-fraction')[0].text
             price = whole+fraction  
-        session.close()
         try:
             float(price)
             print("Price: $" + price)
@@ -25,10 +33,11 @@ class Scraper:
             return 
         return price
         
-    async def get_details(self, asin):
-        session = await self.req(asin)
-        title = session.html.find('#productTitle')[0].text 
-        div = session.html.find('#imgTagWrapperId')[0]
+    def get_title(self, page):
+        title = page.html.find('#productTitle')[0].text 
+        return title
+
+    def get_img(self, page):
+        div = page.html.find('#imgTagWrapperId')[0]
         img = div.xpath('//img/@src')[0]
-        session.close()
-        return title, img
+        return img

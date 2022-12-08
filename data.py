@@ -28,7 +28,7 @@ async def add(asin, email, userID, channelID):
             }
         )
     elif asin not in asin_list:
-        price = await Scraper().get_price(asin)
+        price = await Scraper().scrape('price', asin)
         if price is None:
             return False
         entry = {"entry": 

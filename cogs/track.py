@@ -12,7 +12,7 @@ class track(commands.Cog):
     
     @commands.command()
     async def mention(self, userID, channelID, sale_price, original_price, discount, asin, title, img):
-        embed = discord.Embed(title=f"{title}", url=f'https://www.amazon.ca/gp/product/{asin}', color=discord.Color.orange())
+        embed = discord.Embed(title=f"{title}", url=f'https://www.amazon.ca/dp/{asin}', color=discord.Color.orange())
         embed.set_thumbnail(url=img)
         embed.add_field(name="Discount Amount:", value=f'{discount}%')
         embed.add_field(name="Original Price:", value=original_price)
@@ -29,10 +29,11 @@ class track(commands.Cog):
         await channel.send(f"Hey <@{userID}>, a product you're tracking is on sale!", embed=embed)
 
     async def notify(self, document, current_price, discount):
-        details = await Scraper().get_details(document["ASIN"])     
+        title = await Scraper().scrape('title', document["ASIN"])    
+        img = await Scraper().scrape('img', document["ASIN"]) 
         for userInfo in document["user-info"]:
-            await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], details[0], details[1])
-            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), details[0], current_price, document["price"], discount, document["ASIN"]) 
+            await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], title, img)
+            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), title, current_price, document["price"], discount, document["ASIN"]) 
         fetch_data().delete_one({"entry.ASIN":document["ASIN"]}) 
 
     def compare_price(self, current_price, listed_price):
@@ -48,7 +49,7 @@ class track(commands.Cog):
     async def run(self):
         for document in fetch_data().distinct("entry"):
             print("\nScraping", document["ASIN"])
-            current_price = await Scraper().get_price(document["ASIN"])
+            current_price = await Scraper().scrape('price', document["ASIN"])
             if current_price is not None:
                 discount = self.compare_price(current_price, document["price"])
                 if discount: 
