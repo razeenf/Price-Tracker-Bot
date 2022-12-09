@@ -15,6 +15,7 @@ A simple to use Discord bot that helps you track Amazon.ca products for price dr
 - !help
 - !track `<email address>` `<amazon link>`
 - !stop `<amazon link>`
+- !view
 
 
 ## How it Works

@@ -48,9 +48,12 @@ class commands(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
-        await ctx.send("List of commands:```!track <email address> <amazon link>```"+
-        "```!stop <amazon link>```"+
-        "```!view```")
+        await ctx.send("To start tracking a product use:"
+        +"```yaml\n!track <email address> <amazon link>```"
+        +"To view your tracked products use:"
+        +"```yaml\n!view```"
+        +"To stop tracking a product use:"
+        +"```yaml\n!stop <amazon link>```")
 
 async def verify(link):
     if link.startswith("https://www.amazon.ca/") and 'B0' in link:
