@@ -11,20 +11,23 @@ class commands(commands.Cog):
     @commands.command()
     async def view(self, ctx):
         products = view(ctx.author.id)
+        empty = True
         embed = discord.Embed(title="Products You're Currently Tracking:", color=discord.Color.orange())
+        embed.set_footer(text='You can view up to 25 products.')
         await ctx.send("Fetching your products...")
         for doc in products:
+            empty = False
             name = await Scraper().scrape('title', doc[0])    
             embed.add_field(name=f"{name}", value=f"Price: ${doc[1]} | [Product Page](https://www.amazon.ca/dp/{doc[0]})", inline=False)
-            embed.set_footer(text='You can view up to 25 products.')
+        if empty:
+            embed.add_field(name="You're not tracking any products.", value="Use `!track <email> <product link>` to start tracking a product.", inline=False)   
         await ctx.send(embed=embed)
-        
+    
     @commands.command()
     async def track(self, ctx, email, *, link):
         userID = ctx.author.id
         channelID = ctx.channel.id
         asin = await verify(link)   
-
         if asin is False:
             response = "Invalid link, make sure it's an Amazon.ca product page link."  
         elif '@' not in email or '.com' not in email:
