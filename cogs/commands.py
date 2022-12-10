@@ -45,8 +45,11 @@ class commands(commands.Cog):
         if asin is False:
             response = "Invalid link, make sure it's an Amazon.ca product page link."          
         else:
-            remove(ctx.author.id, asin) 
-            response = "You are no longer tracking this item."
+            removed = remove(ctx.author.id, asin) 
+            if removed is False:
+                response = "You are not tracking this item."
+            else:
+                response = "You are no longer tracking this item."
         await ctx.send(response)
 
     @commands.command()
