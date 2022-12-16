@@ -9,12 +9,9 @@ cluster = MongoClient(getenv('MONGO_URI'), tlsCAFile=certifi.where())
 db = cluster["Amazon-Price-Tracker"]
 collection = db["Entries"]
 
-def fetch_data():
-    return collection
-
 def view(userID):    
     for doc in collection.find({"entry.user-info.userID": userID}):
-        yield doc["entry"]["ASIN"], doc["entry"]["price"]          
+        yield doc["entry"]["title"], doc["entry"]["price"], doc["entry"]["ASIN"]          
     
 async def add(asin, email, userID, channelID):
     exists = collection.find_one({"entry.ASIN" : asin})
@@ -34,9 +31,11 @@ async def add(asin, email, userID, channelID):
         price = await Scraper().scrape('price', asin)
         if price is None:
             return False
+        title = await Scraper().scrape('title', asin)
         entry = {"entry": 
             {
                 "ASIN": f"{asin}",
+                "title": f"{title}",
                 "price": float(price),
                 "user-info": [
                 {
@@ -67,3 +66,6 @@ def remove(userID, asin):
         collection.delete_one({ "entry.user-info.0":{"$exists":False}})
         return True
     return False
+
+def fetch_data():
+    return collection
