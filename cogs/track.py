@@ -28,12 +28,11 @@ class track(commands.Cog):
 
         await channel.send(f"Hey <@{userID}>, a product you're tracking is on sale!", embed=embed)
 
-    async def notify(self, document, current_price, discount):
-        title = await Scraper().scrape('title', document["ASIN"])    
+    async def notify(self, document, current_price, discount):    
         img = await Scraper().scrape('img', document["ASIN"]) 
         for userInfo in document["user-info"]:
-            await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], title, img)
-            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), title, current_price, document["price"], discount, document["ASIN"]) 
+            await self.mention(userInfo["userID"], userInfo["channelID"], current_price, document["price"], discount, document["ASIN"], document["title"], img)
+            create_message(userInfo["email"], self.bot.get_user(userInfo["userID"]), document["title"], current_price, document["price"], discount, document["ASIN"]) 
         fetch_data().delete_one({"entry.ASIN":document["ASIN"]}) 
 
     def compare_price(self, current_price, listed_price):
