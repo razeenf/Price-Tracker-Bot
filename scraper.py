@@ -1,7 +1,7 @@
 from requests_html import AsyncHTMLSession
 
 class Scraper:
-    async def scrape(self, key, asin): # BIG MEMORY LEAK FIX ASAP TOO MANY CHROMIUM INSTANCES
+    async def scrape(self, key, asin): 
         asession = AsyncHTMLSession()
         page = await asession.get(f'https://www.amazon.ca/dp/{asin}')
         print("Status:", page.status_code)
